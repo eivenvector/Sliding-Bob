@@ -8,26 +8,30 @@
 
 /* Begin PBXBuildFile section */
 		2CC8F52D1E550946007337DB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC8F52C1E550946007337DB /* AppDelegate.swift */; };
-		2CC8F52F1E550947007337DB /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 2CC8F52E1E550947007337DB /* GameScene.sks */; };
-		2CC8F5311E550947007337DB /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 2CC8F5301E550947007337DB /* Actions.sks */; };
 		2CC8F5331E550947007337DB /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC8F5321E550947007337DB /* GameScene.swift */; };
 		2CC8F5351E550947007337DB /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC8F5341E550947007337DB /* GameViewController.swift */; };
-		2CC8F5381E550947007337DB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2CC8F5361E550947007337DB /* Main.storyboard */; };
-		2CC8F53A1E550947007337DB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2CC8F5391E550947007337DB /* Assets.xcassets */; };
-		2CC8F53D1E550947007337DB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2CC8F53B1E550947007337DB /* LaunchScreen.storyboard */; };
+		2CC8F5451E5509AB007337DB /* FloorSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC8F5441E5509AB007337DB /* FloorSpriteNode.swift */; };
+		2CC8F5471E5509C5007337DB /* BackgroundSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC8F5461E5509C5007337DB /* BackgroundSpriteNode.swift */; };
+		2CC8F5491E5509DB007337DB /* PlayerSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC8F5481E5509DB007337DB /* PlayerSpriteNode.swift */; };
+		2CC8F54B1E5509EE007337DB /* ObstacleSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC8F54A1E5509EE007337DB /* ObstacleSpriteNode.swift */; };
+		2CC8F54F1E550A76007337DB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2CC8F54E1E550A76007337DB /* Assets.xcassets */; };
+		2CC8F5511E550B1D007337DB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2CC8F5501E550B1D007337DB /* Main.storyboard */; };
+		2CC8F5531E550B2B007337DB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2CC8F5521E550B2B007337DB /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		2CC8F5291E550946007337DB /* Sliding Bob.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Sliding Bob.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CC8F52C1E550946007337DB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		2CC8F52E1E550947007337DB /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
-		2CC8F5301E550947007337DB /* Actions.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Actions.sks; sourceTree = "<group>"; };
 		2CC8F5321E550947007337DB /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		2CC8F5341E550947007337DB /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
-		2CC8F5371E550947007337DB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		2CC8F5391E550947007337DB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		2CC8F53C1E550947007337DB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2CC8F53E1E550947007337DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2CC8F5441E5509AB007337DB /* FloorSpriteNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloorSpriteNode.swift; sourceTree = "<group>"; };
+		2CC8F5461E5509C5007337DB /* BackgroundSpriteNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundSpriteNode.swift; sourceTree = "<group>"; };
+		2CC8F5481E5509DB007337DB /* PlayerSpriteNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerSpriteNode.swift; sourceTree = "<group>"; };
+		2CC8F54A1E5509EE007337DB /* ObstacleSpriteNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObstacleSpriteNode.swift; sourceTree = "<group>"; };
+		2CC8F54E1E550A76007337DB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2CC8F5501E550B1D007337DB /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		2CC8F5521E550B2B007337DB /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,16 +65,26 @@
 			isa = PBXGroup;
 			children = (
 				2CC8F52C1E550946007337DB /* AppDelegate.swift */,
-				2CC8F52E1E550947007337DB /* GameScene.sks */,
-				2CC8F5301E550947007337DB /* Actions.sks */,
 				2CC8F5321E550947007337DB /* GameScene.swift */,
 				2CC8F5341E550947007337DB /* GameViewController.swift */,
-				2CC8F5361E550947007337DB /* Main.storyboard */,
-				2CC8F5391E550947007337DB /* Assets.xcassets */,
-				2CC8F53B1E550947007337DB /* LaunchScreen.storyboard */,
+				2CC8F54D1E550A2C007337DB /* Sprites */,
+				2CC8F5501E550B1D007337DB /* Main.storyboard */,
+				2CC8F54E1E550A76007337DB /* Assets.xcassets */,
+				2CC8F5521E550B2B007337DB /* LaunchScreen.storyboard */,
 				2CC8F53E1E550947007337DB /* Info.plist */,
 			);
 			path = "Sliding Bob";
+			sourceTree = "<group>";
+		};
+		2CC8F54D1E550A2C007337DB /* Sprites */ = {
+			isa = PBXGroup;
+			children = (
+				2CC8F5441E5509AB007337DB /* FloorSpriteNode.swift */,
+				2CC8F5461E5509C5007337DB /* BackgroundSpriteNode.swift */,
+				2CC8F5481E5509DB007337DB /* PlayerSpriteNode.swift */,
+				2CC8F54A1E5509EE007337DB /* ObstacleSpriteNode.swift */,
+			);
+			name = Sprites;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -133,11 +147,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2CC8F5381E550947007337DB /* Main.storyboard in Resources */,
-				2CC8F52F1E550947007337DB /* GameScene.sks in Resources */,
-				2CC8F53A1E550947007337DB /* Assets.xcassets in Resources */,
-				2CC8F53D1E550947007337DB /* LaunchScreen.storyboard in Resources */,
-				2CC8F5311E550947007337DB /* Actions.sks in Resources */,
+				2CC8F54F1E550A76007337DB /* Assets.xcassets in Resources */,
+				2CC8F5531E550B2B007337DB /* LaunchScreen.storyboard in Resources */,
+				2CC8F5511E550B1D007337DB /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -149,31 +161,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				2CC8F5331E550947007337DB /* GameScene.swift in Sources */,
+				2CC8F5471E5509C5007337DB /* BackgroundSpriteNode.swift in Sources */,
 				2CC8F5351E550947007337DB /* GameViewController.swift in Sources */,
 				2CC8F52D1E550946007337DB /* AppDelegate.swift in Sources */,
+				2CC8F5451E5509AB007337DB /* FloorSpriteNode.swift in Sources */,
+				2CC8F54B1E5509EE007337DB /* ObstacleSpriteNode.swift in Sources */,
+				2CC8F5491E5509DB007337DB /* PlayerSpriteNode.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXVariantGroup section */
-		2CC8F5361E550947007337DB /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				2CC8F5371E550947007337DB /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		2CC8F53B1E550947007337DB /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				2CC8F53C1E550947007337DB /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		2CC8F53F1E550947007337DB /* Debug */ = {
