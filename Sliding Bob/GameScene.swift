@@ -15,6 +15,7 @@ import Foundation
 let PLAYER_SPEED = 2.0
 let PLAYER_SPEED_IDLE = 0.0
 let PLAYER_SPEED_JUMP = -1.0
+let PLAYER_WALK_SPEED = -2.0
 let GRAVITY = -9.8
 let WALK_SIZE = CGSize(width: 72.0/2, height: 97.0/2)
 let STAND_SIZE = CGSize(width: 66.0/2, height: 92.0/2)
@@ -62,7 +63,7 @@ struct PhysicsCategory {
 
 
 
-class GameScene: SKScene, SKPhysicsContactDelegate {
+class GameScene: SKScene, SKPhysicsContactDelegate, UIGestureRecognizerDelegate {
     
     // MARK: Properties
     
@@ -95,6 +96,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(swipedUp(sender:)) )
         swipeUp.direction = .up
+        swipeUp.delegate = self
         view.addGestureRecognizer(swipeUp)
         
         let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(swipedDown(sender:)) )
@@ -105,9 +107,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         swipeRight.direction = .right
         view.addGestureRecognizer(swipeRight)
         
-        let singleTap = UITapGestureRecognizer(target: self, action: #selector(tapped(sender:)))
-        singleTap.numberOfTapsRequired = 1
-        view.addGestureRecognizer(singleTap)
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longPressed(sender: )))
+        longPress.minimumPressDuration = 0.03
+        view.addGestureRecognizer(longPress)
         
         //                run(SKAction.repeatForever(
         //                    SKAction.sequence([
@@ -117,7 +119,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         //                ))
     }
     
+    // MARK: UIGestureRecognizer Delegate
     
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return false
+    }
     
     override func update(_ currentTime: TimeInterval) {
         self.moveFloors()
@@ -188,6 +194,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // MARK: Player Controls
     
     func swipedUp(sender: UISwipeGestureRecognizer) {
+        print("swipe up")
         self.player?.endStanding()
         self.player?.endWalking()
         self.player?.beginJumping()
@@ -223,6 +230,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 },
                 SKAction.wait(forDuration: 0.30),
                 SKAction.run {
+                    self.player?.endWalking()
                     self.player?.beginDucking()
                     self.player?.physicsBody?.applyImpulse(CGVector(dx: 15.0, dy: 0.0))
                 },
@@ -239,39 +247,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
-    func tapped(sender: UITapGestureRecognizer) {
-        if ((self.player?.currentStatus == .Standing) || (self.player?.currentStatus == .Idle)) {
-            self.player?.endStanding()
-            if (self.player?.action(forKey: "walkingAction") != nil) {
-                self.player?.removeAction(forKey: "walkingAction")
-            }
-            if (sender.location(in: self.view).x < self.frame.width/2) {
-                self.walkingActionTowards(direction: -1.0)
-            } else {
-                self.walkingActionTowards(direction: 1.0)
-            }
-        } else {
-            return
-        }
-        
-    }
-    
-    func walkingActionTowards(direction: Double) {
-        let walkingAction = SKAction.sequence([
-            SKAction.run {
+    func longPressed(sender: UITapGestureRecognizer) {
+        if (sender.location(in: self.view).x > self.frame.width/2) {
+            if(sender.state == .began) {
+                print("long press began")
+                self.player?.endStanding()
+                self.player?.endDucking()
                 self.player?.beginWalking(time: WALKING_TIME)
-                self.player?.physicsBody?.applyImpulse(CGVector(dx: direction * 15.0, dy: 0.0))
-            },
-            SKAction.wait(forDuration: (5 * WALKING_TIME)),
-            SKAction.run {
+                self.player?.velocity = PLAYER_WALK_SPEED * 1.0
+            } else if (sender.state == .ended) {
+                self.player?.velocity = PLAYER_SPEED
                 self.player?.endWalking()
-            },
-            SKAction.run {
                 self.player?.beginStanding()
             }
-            ])
-        self.run(walkingAction, withKey: "walkingAction")
+            
+        }
     }
+    
     
     // MARK: Obstacle Generation
     
