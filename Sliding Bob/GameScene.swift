@@ -8,14 +8,19 @@
 
 import SpriteKit
 import GameplayKit
+import Foundation
 
 // MARK: GAME CONSTANTS
 
 let PLAYER_SPEED = 2.0
+let PLAYER_SPEED_IDLE = 0.0
+let PLAYER_SPEED_JUMP = -1.0
 let GRAVITY = -9.8
-let STAND_SIZE = CGSize(width: 72.0/2, height: 97.0/2)
+let WALK_SIZE = CGSize(width: 72.0/2, height: 97.0/2)
+let STAND_SIZE = CGSize(width: 66.0/2, height: 92.0/2)
 let DUCK_SIZE = CGSize(width: 72.0/2, height: 71.0/2)
-let DUCK_TIME = 1.0
+let SLIDE_RUN = CGVector(dx: 20.0, dy: 0.0)
+let DUCK_TIME = 0.8
 let WALKING_TIME = 0.1
 
 // MARK: Math Functions
@@ -61,32 +66,32 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     // MARK: Properties
     
-    var floor: FloorSpriteNode?
-    var player: PlayerSpriteNode?
-    var background : SKSpriteNode?
-    var movingBackground: BackgroundSpriteNode?
-    var obstacles: [ObstacleSpriteNode] = []
-    let gestureRecog = UIGestureRecognizer()
+    private var floor: FloorSpriteNode?
+    private var player: PlayerSpriteNode?
+    private var background : SKSpriteNode?
+    private var movingBackground: BackgroundSpriteNode?
+    private var obstacles: [ObstacleSpriteNode] = []
     
     // MARK: SKNode Overrides
     
     override func addChild(_ node: SKNode) {
         super.addChild(node)
         if node.physicsBody?.categoryBitMask == PhysicsCategory.Obstacle {
-            obstacles.append((node as? ObstacleSpriteNode)!)
+            self.obstacles.append((node as? ObstacleSpriteNode)!)
         }
     }
     
     // MARK: SKScene Overrides
     
     override func didMove(to view: SKView) {
-        setupBackground(view: view)
-        physicsWorld.gravity = CGVector(dx: 0.0, dy: GRAVITY)
-        physicsWorld.contactDelegate = self
+        self.setupBackground(view: view)
+        self.physicsWorld.gravity = CGVector(dx: 0.0, dy: GRAVITY)
+        self.physicsWorld.contactDelegate = self
         view.showsPhysics = true
-        setupFloors()
-        createPlayer()
-        createWalls()
+        self.setupFloors()
+        self.createPlayer()
+        self.createWalls()
+        self.player?.beginStanding()
         
         let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(swipedUp(sender:)) )
         swipeUp.direction = .up
@@ -100,23 +105,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         swipeRight.direction = .right
         view.addGestureRecognizer(swipeRight)
         
-        
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(tapped(sender:)))
         singleTap.numberOfTapsRequired = 1
         view.addGestureRecognizer(singleTap)
         
-        //        run(SKAction.repeatForever(
-        //            SKAction.sequence([
-        //                SKAction.run({self.createFly(view: view, withVelocity: Double(random(min:2, max: 6)))}),
-        //                SKAction.wait(forDuration: 1.3)
-        //                ])
-        //        ))
+        //                run(SKAction.repeatForever(
+        //                    SKAction.sequence([
+        //                        SKAction.run({self.createFly(view: view, withVelocity: Double(random(min:2, max: 6)))}),
+        //                        SKAction.wait(forDuration: 1.3)
+        //                        ])
+        //                ))
     }
     
     
     
     override func update(_ currentTime: TimeInterval) {
-        moveFloors()
+        self.moveFloors()
+        self.movePlayer()
         for obstacle in obstacles {
             moveAnObstacle(obstacle: obstacle, withSpeed: CGFloat(obstacle.velocity))
         }
@@ -142,23 +147,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             (bodyTwo.categoryBitMask & PhysicsCategory.Player != 0)) {
             if let _ = bodyOne.node as? FloorSpriteNode,
                 let player = bodyTwo.node as? PlayerSpriteNode {
-                if (player.action(forKey: "walking") == nil) && (player.action(forKey: "ducking") == nil) {
-                    player.beginWalkingAnimation(time: WALKING_TIME)
-                }
+                player.endJumping()
+                player.beginStanding()
             }
         } else if ((bodyOne.categoryBitMask & PhysicsCategory.Obstacle != 0) &&
             (bodyTwo.categoryBitMask & PhysicsCategory.Player != 0)) {
-            if let obstacle = bodyOne.node as? ObstacleSpriteNode,
-                let player = bodyTwo.node as? PlayerSpriteNode {
-                if playerContacted(player: player, aboveObstacle: obstacle) && obstacle.name == "block" {
-                    player.beginWalkingAnimation(time: WALKING_TIME)
-                } else {
-                    player.physicsBody?.applyImpulse(CGVector(dx: 0.0, dy: 10.0))
-                }
-            }
+            return
         }
-        
     }
+    
     
     
     private func playerContacted(player: PlayerSpriteNode, aboveObstacle obstacle: ObstacleSpriteNode) -> Bool {
@@ -179,55 +176,63 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // MARK: Player
     
     func createPlayer() {
-        player = PlayerSpriteNode(withSize: STAND_SIZE)
-        player?.position = CGPoint(x:size.width * 0.2, y: (size.height * 0.2) + (player!.size.height/2))
-        addChild(player!)
+        self.player = PlayerSpriteNode(withSize: STAND_SIZE)
+        self.player?.position = CGPoint(x:size.width * 0.2, y: (size.height * 0.2) + (self.player!.size.height/2))
+        self.addChild(player!)
+    }
+    
+    func movePlayer() {
+        self.player?.position.x -= CGFloat((self.player?.velocity)!)
     }
     
     // MARK: Player Controls
     
     func swipedUp(sender: UISwipeGestureRecognizer) {
-        if (player?.action(forKey: "walking") != nil) {
-            player?.beginJump()
-        }
+        self.player?.endStanding()
+        self.player?.endWalking()
+        self.player?.beginJumping()
     }
     
     func swipedDown(sender: UISwipeGestureRecognizer) {
-        if (player?.action(forKey: "walking") != nil) {
-            run(SKAction.sequence([
+        if (self.player?.currentStatus != .Ducking){
+            self.player?.endStanding()
+            self.player?.endJumping()
+            self.run(SKAction.sequence([
                 SKAction.run {
-                    self.player?.beginDuckWithSize(size: DUCK_SIZE)
+                    self.player?.beginDucking()
                 },
                 SKAction.wait(forDuration: DUCK_TIME),
                 SKAction.run {
-                    self.player?.endDuckWithSize(size: STAND_SIZE)
+                    self.player?.endDucking()
+                    self.player?.beginStanding()
                 }
-                ])
-            )
-            
+                ]))
         }
     }
     
     func swipedRight(sender: UISwipeGestureRecognizer) {
-        if (player?.action(forKey: "walking") != nil) {
-            run(SKAction.sequence([
+        if ((self.player?.currentStatus != .Sliding)) {
+            self.player?.endWalking()
+            self.player?.endJumping()
+            self.player?.endStanding()
+            self.player?.beginSliding()
+            self.run(SKAction.sequence([
                 SKAction.run {
-                    self.player?.removeAction(forKey: "walking")
-                },
-                SKAction.run {
-                    self.player?.beginWalkingAnimation(time: 0.05)
-                },
-                SKAction.run {
-                    self.player?.physicsBody?.applyImpulse(CGVector(dx: 20.0, dy: 0.0))
+                    self.player?.beginWalking(time: WALKING_TIME/2)
+                    self.player?.physicsBody?.applyImpulse(CGVector(dx: 25.0, dy: 0.0))
                 },
                 SKAction.wait(forDuration: 0.30),
                 SKAction.run {
-                    self.player?.beginDuckWithSize(size: DUCK_SIZE, movingForward: true)
-                    self.player?.physicsBody?.applyImpulse(CGVector(dx: 10.0, dy: 0.0))
+                    self.player?.beginDucking()
+                    self.player?.physicsBody?.applyImpulse(CGVector(dx: 15.0, dy: 0.0))
                 },
                 SKAction.wait(forDuration: DUCK_TIME),
                 SKAction.run {
-                    self.player?.endDuckWithSize(size: STAND_SIZE)
+                    self.player?.endDucking()
+                    self.player?.endSliding()
+                },
+                SKAction.run {
+                    self.player?.beginStanding()
                 }
                 ]))
             
@@ -235,13 +240,37 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func tapped(sender: UITapGestureRecognizer) {
-        if (player?.action(forKey: "walking") != nil)  {
-            if sender.location(in: self.view).x < self.frame.width/2 {
-                player?.physicsBody?.applyImpulse(CGVector(dx: -5.0, dy: 0.0))
-            } else {
-                player?.physicsBody?.applyImpulse(CGVector(dx: 5.0, dy: 0.0))
+        if ((self.player?.currentStatus == .Standing) || (self.player?.currentStatus == .Idle)) {
+            self.player?.endStanding()
+            if (self.player?.action(forKey: "walkingAction") != nil) {
+                self.player?.removeAction(forKey: "walkingAction")
             }
+            if (sender.location(in: self.view).x < self.frame.width/2) {
+                self.walkingActionTowards(direction: -1.0)
+            } else {
+                self.walkingActionTowards(direction: 1.0)
+            }
+        } else {
+            return
         }
+        
+    }
+    
+    func walkingActionTowards(direction: Double) {
+        let walkingAction = SKAction.sequence([
+            SKAction.run {
+                self.player?.beginWalking(time: WALKING_TIME)
+                self.player?.physicsBody?.applyImpulse(CGVector(dx: direction * 15.0, dy: 0.0))
+            },
+            SKAction.wait(forDuration: (5 * WALKING_TIME)),
+            SKAction.run {
+                self.player?.endWalking()
+            },
+            SKAction.run {
+                self.player?.beginStanding()
+            }
+            ])
+        self.run(walkingAction, withKey: "walkingAction")
     }
     
     // MARK: Obstacle Generation
@@ -338,8 +367,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         )
     }
     
-    
-    
+
     // MARK: Private Methods
     
     private func centerFromNode(node: SKSpriteNode) -> CGPoint{

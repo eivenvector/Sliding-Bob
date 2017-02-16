@@ -13,7 +13,6 @@ class PlayerSpriteNode: SKSpriteNode {
     
     // MARK: Properties
     
-    private var animation: SKAction?
     var currentStatus: CurrentStatus = .Idle
     var velocity = 0.0
     
@@ -24,9 +23,7 @@ class PlayerSpriteNode: SKSpriteNode {
     private let duckTexture = SKTexture(imageNamed: "p1_duck")
     private let textureAtlas = SKTextureAtlas(named: "player")
     private let frames = ["p1_walk01", "p1_walk02", "p1_walk03",
-                          "p1_walk04", "p1_walk05", "p1_walk06",
-                          "p1_walk07", "p1_walk08", "p1_walk09",
-                          "p1_walk10", "p1_walk11"].map {
+                          "p1_walk04", "p1_walk05"].map {
                             SKTextureAtlas(named: "player").textureNamed($0)
                             }
     
@@ -35,8 +32,10 @@ class PlayerSpriteNode: SKSpriteNode {
     
     func beginStanding() {
         if (self.currentStatus == .Idle) {
+            print("began standing called")
             self.currentStatus = .Standing
             self.texture = self.standTexture
+            self.size = STAND_SIZE
             self.velocity = PLAYER_SPEED
         } else {
             return
@@ -45,22 +44,28 @@ class PlayerSpriteNode: SKSpriteNode {
     
     func endStanding() {
         if (self.currentStatus == .Standing) {
+            print("end standing called")
             self.currentStatus = .Idle
             self.velocity = PLAYER_SPEED_IDLE
         } else {
             return
         }
     }
-    
+
     func beginWalking(time: TimeInterval) {
-        if (self.currentStatus == .Idle) {
+        if (self.currentStatus == .Idle)  {
+            print("beginWalking called")
+            self.currentStatus = .Walking
+            self.size = WALK_SIZE
             let animate = SKAction.animate(with: self.frames, timePerFrame: time)
-            let animation = SKAction.repeatForever(animate)
+            let animation = SKAction.repeat(animate, count: 1)
             
             self.run(animation, withKey: "walking")
         } else if (self.currentStatus == .Sliding) {
+            print("beginWalking called")
+            self.size = WALK_SIZE
             let animate = SKAction.animate(with: self.frames, timePerFrame: time)
-            let animation = SKAction.repeatForever(animate)
+            let animation = SKAction.repeat(animate, count: 1)
             self.run(animation, withKey: "walking")
         } else {
             return
@@ -69,8 +74,11 @@ class PlayerSpriteNode: SKSpriteNode {
     
     func endWalking() {
         if (self.currentStatus == .Walking) {
+            print("endWalking called")
+            self.velocity = PLAYER_SPEED_IDLE
             self.currentStatus = .Idle
             self.removeAction(forKey: "walking")
+            self.removeAction(forKey: "walkingAction")
         } else {
             return
         }
@@ -78,9 +86,10 @@ class PlayerSpriteNode: SKSpriteNode {
     
     func beginJumping() {
         if (self.currentStatus == .Idle) {
+            print("beginJumping called")
             self.currentStatus = .Jumping
             self.texture = self.jumpTexture
-            
+            self.velocity = PLAYER_SPEED_JUMP
             let impulse = CGVector(dx: 0.0, dy: 40.0)
             self.physicsBody?.applyImpulse(impulse)
         } else {
@@ -90,7 +99,9 @@ class PlayerSpriteNode: SKSpriteNode {
 
     func endJumping() {
         if (self.currentStatus == .Jumping) {
+            print("endJumping called")
             self.currentStatus = .Idle
+            self.velocity = PLAYER_SPEED_IDLE
         } else {
             return
         }
@@ -98,12 +109,16 @@ class PlayerSpriteNode: SKSpriteNode {
     
     func beginDucking() {
         if (self.currentStatus == .Idle) {
+            print("beginDucking called")
             self.currentStatus = .Ducking
             self.texture = self.duckTexture
+            self.velocity = PLAYER_SPEED
             self.size = DUCK_SIZE
             self.setDuckingBody()
         } else if (self.currentStatus == .Sliding) {
+            print("beginDucking called")
             self.texture = self.duckTexture
+            self.velocity = PLAYER_SPEED_IDLE
             self.size = DUCK_SIZE
             self.setDuckingBody()
         } else {
@@ -113,10 +128,12 @@ class PlayerSpriteNode: SKSpriteNode {
     
     func endDucking() {
         if (self.currentStatus == .Ducking) {
+            print("endDucking called")
             self.currentStatus = .Idle
             self.size = STAND_SIZE
             self.setPhysicsBody()
         } else if (self.currentStatus == .Sliding) {
+            print("endDuckign called")
             self.size = STAND_SIZE
             self.setPhysicsBody()
         } else {
@@ -126,25 +143,8 @@ class PlayerSpriteNode: SKSpriteNode {
     
     func beginSliding() {
         if (self.currentStatus == .Idle) {
+            print("beginSliding called")
             self.currentStatus = .Sliding
-            let slidingAction = SKAction.sequence([
-                SKAction.applyImpulse(SLIDE_RUN, duration: 1.0),
-                SKAction.run {
-                    self.beginWalking(time: 0.05)
-                },
-                SKAction.wait(forDuration: 0.30),
-                SKAction.run {
-                    self.removeAction(forKey: "walking")
-                },
-                SKAction.run {
-                    self.beginDucking()
-                },
-                SKAction.applyImpulse(SLIDE_RUN, duration: 1.0),
-                SKAction.run {
-                    self.endDucking()
-                }
-                ])
-            self.run(slidingAction, withKey: "sliding")
         } else {
             return
         }
@@ -152,8 +152,8 @@ class PlayerSpriteNode: SKSpriteNode {
     
     func endSliding() {
         if (self.currentStatus == .Sliding) {
+            print("endSliding called")
             self.currentStatus = .Idle
-            self.removeAction(forKey: "sliding")
         }
     }
         
@@ -181,8 +181,7 @@ class PlayerSpriteNode: SKSpriteNode {
     // MARK: Initializations
     
     init(withSize size: CGSize) {
-        let texture = SKTexture(imageNamed: "p1_walk01")
-        super.init(texture: texture, color: .clear, size: size)
+        super.init(texture: self.standTexture, color: .clear, size: size)
         self.name = "player"
         setPhysicsBody()
     }
